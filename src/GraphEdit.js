@@ -51,7 +51,9 @@ function GraphEdit(d3, _, graph) {
     svg.on("mouseup", mouseUp);
     svg.on("mousemove", mouseMove);
     d3.selectAll('.mode-radio-labels').selectAll('input')
-        .on("click", function () { mode = d3.select(this).property("value")});
+        .on("click", function () {
+          mode = d3.select(this).property("value");
+        });
 
     /**
      * A callback for a mouse event

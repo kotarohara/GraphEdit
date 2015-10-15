@@ -179,7 +179,7 @@ function Vertex (id, x, y) {
         addEdge: addEdge,
         getEdges: getEdges,
         removeEdge: removeEdge
-    }
+    };
 }
 
 function Edge (id, source, target) {
@@ -190,6 +190,5 @@ function Edge (id, source, target) {
         id: _id,
         source: _source,
         target: _target
-    }
+    };
 }
-
