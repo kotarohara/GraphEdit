@@ -1,8 +1,6 @@
 GraphEdit
 =========
 
-![GraphEdit](/images/graphedit.png "GraphEdit Logo")
-
 GraphEdit is a simple JavaScript-based application for graph editing.
 
 Dependencies
