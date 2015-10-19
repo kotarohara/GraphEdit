@@ -220,9 +220,10 @@ function GraphEdit(d3, _, graph) {
     /**
      * A method to render stuff.
      */
+    var line, circle, temporaryLine, temporaryCircle;
     function update() {
         // Render Segments
-        var line = segmentContainer.selectAll("line")
+        line = segmentContainer.selectAll("line")
             .data(graph.edges);
         line.enter().append("line")
             .attr("stroke-width", 3)
@@ -233,7 +234,7 @@ function GraphEdit(d3, _, graph) {
         line.exit().remove();
         line.attr(edgeCoordinates);
 
-        var circle = vertexContainer.selectAll("circle")
+        circle = vertexContainer.selectAll("circle")
             .data(graph.vertices);
         circle.enter().append("circle")
             .attr("fill", "steelblue")
@@ -245,7 +246,7 @@ function GraphEdit(d3, _, graph) {
         circle.exit().remove();
         circle.attr(vertexCoordinate);
 
-        var temporaryLine = temporaryDomContainer.selectAll("line")
+        temporaryLine = temporaryDomContainer.selectAll("line")
             .data(temporaryEdges);
         temporaryLine.enter().append("line")
             .attr("stroke-width", 3)
@@ -254,7 +255,7 @@ function GraphEdit(d3, _, graph) {
         temporaryLine.exit().remove();
         temporaryLine.attr(edgeCoordinates);
 
-        var temporaryCircle = temporaryDomContainer.selectAll("circle")
+        temporaryCircle = temporaryDomContainer.selectAll("circle")
             .data(temporaryVertices);
 
         temporaryCircle.enter().append("circle")
@@ -265,6 +266,19 @@ function GraphEdit(d3, _, graph) {
         temporaryCircle.exit().remove();
         temporaryCircle.attr(vertexCoordinate);
     }
+    // http://bl.ocks.org/mbostock/4560481#index.html
+    // var brush = svg.append("g")
+    //    .attr("class", "brush")
+    //    .call(d3.svg.brush()
+    //        .x(d3.scale.identity().domain([0, width]))
+    //        .y(d3.scale.identity().domain([0, height]))
+    //        .on("brush", function() {
+    //            var extent = d3.event.target.extent();
+    //            circle.classed("active", function(d) {
+    //                return extent[0][0] <= d.x && d.x < extent[1][0]
+    //                    && extent[0][1] <= d.y && d.y < extent[1][1];
+    //            });
+    //        }));
 
     update();
     return {
