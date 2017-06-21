@@ -140,6 +140,11 @@ function Graph() {
     };
 }
 
+function Displacement (x, y) {
+    this.x = x;
+    this.y = y;
+}
+
 function Velocity (x, y) {
     this.x = x;
     this.y = y;
@@ -147,8 +152,11 @@ function Velocity (x, y) {
 
 function Vertex (id, x, y) {
     var _id = id,
-        _edges = [];
+        _edges = [],
+        _x = x,
+        _y = y;
 
+    var _displacement = new Displacement(0, 0);
     var _velocity = new Velocity(0, 0);
 
     /**
@@ -180,12 +188,14 @@ function Vertex (id, x, y) {
     }
 
     return {
-        x: x,
-        y: y,
+        x: _x,
+        y: _y,
         id: _id,
         addEdge: addEdge,
         getEdges: getEdges,
-        removeEdge: removeEdge
+        removeEdge: removeEdge,
+        displacement: _displacement,
+        velocity: _velocity
     };
 }
 
