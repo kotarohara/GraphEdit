@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!-- https://bl.ocks.org/mbostock/6123708 -->
+<meta charset="utf-8">
+<style>
+
+.dot circle {
+  fill: lightsteelblue;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.dot circle.dragging {
+  fill: red;
+  stroke: brown;
+}
+
+.axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+  vector-effect: non-scaling-stroke;
+}
+
+</style>
+<body>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/8E914DB4-AF7A-A24C-9392-5A8B733F605A/main.js" charset="UTF-8"></script>
+<link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/A506F337B8A5-2939-C42A-A7FA-4BD419E8/abn/main.css"/>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="lib/underscore.min.js"></script>
+<script src="src/Graph.js"></script>
+<script src="src/GraphEdit.js"></script>
+<script>
+
+var margin = {top: -5, right: -5, bottom: -5, left: -5},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+var drag = d3.behavior.drag()
+    .origin(function(d) { return d; })
+    .on("dragstart", dragstarted)
+    .on("drag", dragged)
+    .on("dragend", dragended);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+    .call(zoom);
+
+var rect = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all");
+
+var container = svg.append("g");
+
+container.append("g")
+    .attr("class", "x axis")
+  .selectAll("line")
+    .data(d3.range(0, width, 10))
+  .enter().append("line")
+    .attr("x1", function(d) { return d; })
+    .attr("y1", 0)
+    .attr("x2", function(d) { return d; })
+    .attr("y2", height);
+
+container.append("g")
+    .attr("class", "y axis")
+  .selectAll("line")
+    .data(d3.range(0, height, 10))
+  .enter().append("line")
+    .attr("x1", 0)
+    .attr("y1", function(d) { return d; })
+    .attr("x2", width)
+    .attr("y2", function(d) { return d; });
+
+var graph = new Graph(),
+        v0 = graph.addVertex(0, 300, 100),
+        v1 = graph.addVertex(1, 100, 100),
+        v2 = graph.addVertex(2, 100, 300),
+        v3 = graph.addVertex(3, 300, 300),
+        v4 = graph.addVertex(4, 300, 200),
+        v5 = graph.addVertex(5, 250, 200),
+        e0 = graph.addEdge(0, v0, v1),
+        e1 = graph.addEdge(1, v1, v2);
+        e2 = graph.addEdge(2, v2, v3);
+        e3 = graph.addEdge(3, v3, v4);
+        e4 = graph.addEdge(4, v4, v5);
+
+var dot = container.append("g")
+      .attr("class", "dot")
+    .selectAll("circle")
+      .data(graph.vertices)
+    .enter().append("circle")
+      .attr("r", 5)
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .call(drag);
+
+
+function zoomed() {
+  container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
+function dragstarted(d) {
+  d3.event.sourceEvent.stopPropagation();
+  d3.select(this).classed("dragging", true);
+}
+
+function dragged(d) {
+  d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+}
+
+function dragended(d) {
+  d3.select(this).classed("dragging", false);
+}
+
+</script>

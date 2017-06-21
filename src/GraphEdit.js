@@ -1,17 +1,84 @@
-function GraphEdit(d3, _, graph) {
-    var mode = "draw", // "edit"
+function GraphEdit(graph) {
+    // References:
+    // - https://bl.ocks.org/mbostock/6123708
+    var mode = "edit", // "draw"
         mousedownVertex,
         temporaryVertices = [],
         temporaryEdges = [];
+
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([1, 10])
+        .on("zoom", zoomed);
+
+    function zoomed() {
+      container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+
+    function startDraggingPlane () {
+        d3.event.sourceEvent.stopPropagation();
+        d3.select(this).classed("dragging", true);
+    }
+
+    function draggingPlane () {
+        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+    }
+
+    function endDraggingPlane () {
+        d3.select(this).classed("dragging", false);
+    }
+
+    var dragPlane = d3.behavior.drag()
+        .origin(function (d) { return d; })
+        .on('dragstart', startDraggingPlane)
+        .on('drag', draggingPlane)
+        .on('dragend', endDraggingPlane);
+
+    var margin = {top: -5, right: -5, bottom: -5, left: -5},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
     // Prepare svg elements
     var svg = d3.select("body")
             .append("svg")
             .attr("width", width)
-            .attr("height", height),
-        segmentContainer = svg.append("g"),
-        temporaryDomContainer = svg.append("g"),
-        vertexContainer = svg.append("g");
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+            .call(zoom);
+
+    var rect = svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "none")
+        .style("pointer-events", "all");
+
+    var container = svg.append("g");
+    container.append("g")
+    .attr("class", "x axis")
+  .selectAll("line")
+    .data(d3.range(0, width, 10))
+  .enter().append("line")
+    .attr("x1", function(d) { return d; })
+    .attr("y1", 0)
+    .attr("x2", function(d) { return d; })
+    .attr("y2", height);
+
+container.append("g")
+    .attr("class", "y axis")
+  .selectAll("line")
+    .data(d3.range(0, height, 10))
+  .enter().append("line")
+    .attr("x1", 0)
+    .attr("y1", function(d) { return d; })
+    .attr("x2", width)
+    .attr("y2", function(d) { return d; });
+
+    var segmentContainer = container.append("g");
+    var temporaryDomContainer = container.append("g");
+    var vertexContainer = container.append("g");
+
+
+
 
     // Define behaviors and attributes
     var dragEdge = d3.behavior.drag()

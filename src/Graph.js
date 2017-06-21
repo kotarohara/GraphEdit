@@ -3,7 +3,7 @@
  * Reference: https://github.com/chenglou/data-structures/blob/master/source/Graph.coffee
  * @constructor
  */
-function Graph(_) {
+function Graph() {
     var _vertices = {},
         _edges = {},
         _vertexArray = [],
@@ -140,9 +140,16 @@ function Graph(_) {
     };
 }
 
+function Velocity (x, y) {
+    this.x = x;
+    this.y = y;
+}
+
 function Vertex (id, x, y) {
     var _id = id,
         _edges = [];
+
+    var _velocity = new Velocity(0, 0);
 
     /**
      * Add an edgeId.

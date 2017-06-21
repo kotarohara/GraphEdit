@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GraphEdit</title>
+    <link rel="stylesheet" href="css/ge.css" />
+</head>
+<style>
+    .brush .extent {
+        fill-opacity: .1;
+        stroke: #fff;
+        shape-rendering: crispEdges;
+    }
+
+    .dot circle {
+      fill: lightsteelblue;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+
+    .dot circle.dragging {
+      fill: red;
+      stroke: brown;
+    }
+
+    .axis line {
+      fill: none;
+      stroke: #ddd;
+      shape-rendering: crispEdges;
+      vector-effect: non-scaling-stroke;
+    }
+
+</style>
+<body>
+    <div>
+        <table>
+            <tr>
+                <td>mouse x:</td>
+                <td id="mousex"></td>
+                <td>mouse y:</td>
+                <td id="mousey"></td>
+            </tr>
+            <tr>
+                <td>mouse vx:</td>
+                <td id="mousevx"></td>
+                <td>mouse vy:</td>
+                <td id="mousevy"></td>
+            </tr>
+    </div>
+    <form>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="draw"> Draw</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="edit" checked> Edit</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="delete"> Delete</label>
+    </form>
+</body>
+<script src="lib/d3.js"></script>
+<script src="lib/underscore.min.js"></script>
+<script src="src/Graph.js"></script>
+<script src="src/GraphEdit.js"></script>
+<script src="src/Mouse.js"></script>
+<script>
+
+    var mouse = new Mouse();
+
+    var graph = new Graph(),
+        v0 = graph.addVertex(0, 300, 100),
+        v1 = graph.addVertex(1, 100, 100),
+        v2 = graph.addVertex(2, 100, 300),
+        v3 = graph.addVertex(3, 300, 300),
+        v4 = graph.addVertex(4, 300, 200),
+        v5 = graph.addVertex(5, 250, 200),
+        e0 = graph.addEdge(0, v0, v1),
+        e1 = graph.addEdge(1, v1, v2);
+        e2 = graph.addEdge(2, v2, v3);
+        e3 = graph.addEdge(3, v3, v4);
+        e4 = graph.addEdge(4, v4, v5);
+
+    var graphEdit = new GraphEdit(graph);
+</script>
+</html>
