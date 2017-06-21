@@ -194,7 +194,8 @@ function Vertex (id, x, y) {
         addEdge: addEdge,
         getEdges: getEdges,
         removeEdge: removeEdge,
-        displacement: _displacement,
+        dx: _displacement.x,
+        dy: _displacement.y,
         velocity: _velocity
     };
 }

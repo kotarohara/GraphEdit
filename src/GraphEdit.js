@@ -1,4 +1,4 @@
-function GraphEdit(graph) {
+function GraphEdit(graph, mouse) {
     // References:
     // - https://bl.ocks.org/mbostock/6123708
     var mode = "edit", // "draw"
@@ -12,26 +12,9 @@ function GraphEdit(graph) {
 
     function zoomed() {
       container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      
+      console.log("=== Plane Translated ===");
     }
-
-    function startDraggingPlane () {
-        d3.event.sourceEvent.stopPropagation();
-        d3.select(this).classed("dragging", true);
-    }
-
-    function draggingPlane () {
-        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-    }
-
-    function endDraggingPlane () {
-        d3.select(this).classed("dragging", false);
-    }
-
-    var dragPlane = d3.behavior.drag()
-        .origin(function (d) { return d; })
-        .on('dragstart', startDraggingPlane)
-        .on('drag', draggingPlane)
-        .on('dragend', endDraggingPlane);
 
     var margin = {top: -5, right: -5, bottom: -5, left: -5},
         width = 960 - margin.left - margin.right,
@@ -46,32 +29,34 @@ function GraphEdit(graph) {
             .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
             .call(zoom);
 
-    var rect = svg.append("rect")
+    var container = svg.append("g");
+
+    container.append("rect")
         .attr("width", width)
         .attr("height", height)
         .style("fill", "none")
         .style("pointer-events", "all");
-
-    var container = svg.append("g");
+    
     container.append("g")
-    .attr("class", "x axis")
-  .selectAll("line")
-    .data(d3.range(0, width, 10))
-  .enter().append("line")
-    .attr("x1", function(d) { return d; })
-    .attr("y1", 0)
-    .attr("x2", function(d) { return d; })
-    .attr("y2", height);
+        .attr("class", "x axis")
+      .selectAll("line")
+        .data(d3.range(0, width, 10))
+      .enter().append("line")
+        .attr("x1", function(d) { return d; })
+        .attr("y1", 0)
+        .attr("x2", function(d) { return d; })
+        .attr("y2", height);
 
-container.append("g")
-    .attr("class", "y axis")
-  .selectAll("line")
-    .data(d3.range(0, height, 10))
-  .enter().append("line")
-    .attr("x1", 0)
-    .attr("y1", function(d) { return d; })
-    .attr("x2", width)
-    .attr("y2", function(d) { return d; });
+    container.append("g")
+        .attr("class", "y axis")
+      .selectAll("line")
+        .data(d3.range(0, height, 10))
+      .enter().append("line")
+        .attr("x1", 0)
+        .attr("y1", function(d) { return d; })
+        .attr("x2", width)
+        .attr("y2", function(d) { return d; });
+
 
     var segmentContainer = container.append("g");
     var temporaryDomContainer = container.append("g");
@@ -93,30 +78,30 @@ container.append("g")
             .on("dragend", endedDraggingVertex),
         edgeCoordinates = {
             x1: function (edge) {
-                return edge.source.x;
+                return edge.source.x + edge.source.dx;
             },
             y1: function (edge) {
-                return edge.source.y;
+                return edge.source.y + edge.source.dy;
             },
             x2: function (edge) {
-                return edge.target.x;
+                return edge.target.x + edge.target.dx;
             },
             y2: function (edge) {
-                return edge.target.y;
+                return edge.target.y + edge.target.dy;
             }
         },
         vertexCoordinate = {
             cx: function (d) {
-                return d.x;
+                return d.x + d.dx;
             },
             cy: function (d) {
-                return d.y;
+                return d.y + d.dy;
             }
         };
 
     // Attach callbacks
-    svg.on("mouseup", mouseUp);
-    svg.on("mousemove", mouseMove);
+    container.on("mouseup", mouseUp);
+    container.on("mousemove", mouseMove);
     d3.selectAll('.mode-radio-labels').selectAll('input')
         .on("click", function () {
           mode = d3.select(this).property("value");
@@ -128,7 +113,7 @@ container.append("g")
      */
     function mouseUp () {
         if (mode == "draw") {
-
+        
             if (mousedownVertex) {
                 // Create a new vertex and a new edge
                 var newVertex = graph.addVertex(graph.getUniqueVertexId(), d3.mouse(this)[0], d3.mouse(this)[1]);
@@ -164,6 +149,8 @@ container.append("g")
         if (mode == "edit") {
             d3.event.sourceEvent.stopPropagation();
             d3.select(this).classed("dragging", true);
+        } else if (mode == "draw") {
+            d3.event.sourceEvent.stopPropagation();
         }
     }
 
@@ -263,6 +250,8 @@ container.append("g")
                 }
             } else if (mode == "delete") {
                 graph.removeVertex(d.id);
+            } else if (mode == "edit") {
+                // d3.event.stopPropagation();
             }
             temporaryVertices.splice(0, temporaryVertices.length);
             temporaryEdges.splice(0, temporaryEdges.length);
@@ -301,6 +290,7 @@ container.append("g")
         line.exit().remove();
         line.attr(edgeCoordinates);
 
+        // Render circles
         circle = vertexContainer.selectAll("circle")
             .data(graph.vertices);
         circle.enter().append("circle")
