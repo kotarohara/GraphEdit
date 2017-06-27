@@ -141,6 +141,11 @@ function Graph() {
         }
     }
 
+    /**
+     * Need to update this method that computes the pairwise repelling forces.
+     * Current O(N^2) method does not scale. Consider reimplementing it with
+     * the Fast Multipole algorithm.
+     */
     function updateVertexVelocity_Pair () {
         var accumulator = [];
         for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
