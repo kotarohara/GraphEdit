@@ -154,12 +154,16 @@ function Graph() {
 
         for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
             for (var j = 0, len_j = _vertexArray.length; j < len_j; j++) {
+
+                const v1 = _vertexArray[i], v2 = _vertexArray[j];
                 const dist = distance(i, j);
-                if (dist === 0) continue;
+
+                if (v1.id === v2.id) continue;
 
                 const magnitude = magnitudeConstant_a / Math.exp(magnitudeConstant_b * dist);
-                const v1 = _vertexArray[i], v2 = _vertexArray[j];
-                const angle = Math.atan2(v2.y - v1.y, v2.x - v1.x);
+
+                const noise = (Math.random() - 0.5) * 0.01;
+                const angle = Math.atan2(v2.y - v1.y + noise, v2.x - v1.x + noise);
 
                 accumulator[j].x += magnitude * Math.cos(angle);
                 accumulator[j].y += magnitude * Math.sin(angle);

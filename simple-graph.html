@@ -66,16 +66,24 @@
 
     var graph = new Graph(),
         v0 = graph.addVertex(0, 300, 100),
-        v1 = graph.addVertex(1, 100, 100),
-        v2 = graph.addVertex(2, 100, 300),
+        v1 = graph.addVertex(1, 101, 99),
+        v2 = graph.addVertex(2, 103, 302),
         v3 = graph.addVertex(3, 300, 300),
         v4 = graph.addVertex(4, 300, 200),
         v5 = graph.addVertex(5, 250, 200),
+        v6 = graph.addVertex(6, 299, 199),
+        v7 = graph.addVertex(7, 500, 100),
+        v8 = graph.addVertex(8, 502, 301),
+        v9 = graph.addVertex(9, 501, 101),
         e0 = graph.addEdge(0, v0, v1),
-        e1 = graph.addEdge(1, v1, v2);
-        e2 = graph.addEdge(2, v2, v3);
-        e3 = graph.addEdge(3, v3, v4);
-        e4 = graph.addEdge(4, v4, v5);
+        e1 = graph.addEdge(1, v1, v2),
+        e2 = graph.addEdge(2, v2, v3),
+        e3 = graph.addEdge(3, v3, v4),
+        e4 = graph.addEdge(4, v4, v5),
+        e5 = graph.addEdge(5, v0, v6),
+        e6 = graph.addEdge(6, v0, v7),
+        e7 = graph.addEdge(7, v3, v8),
+        e8 = graph.addEdge(8, v8, v9);
 
     var graphEdit = new GraphEdit(graph, mouse);
     graph.setGE(graphEdit);
