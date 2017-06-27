@@ -10,6 +10,16 @@ function Graph() {
         _edgeArray = [],
         _uniqueVertexId = 0,
         _uniqueEdgeId = 0;
+    var _graphEdit;
+
+    const refreshRate_m = 1 / 60 * 1000;  // Displacement refreshrate
+
+    var magnitudeConstant_a = 0, magnitudeConstant_b = 0.05;
+    const dumpingFactor = 0.9;
+
+    function turnRepelOn() {
+        magnitudeConstant_a = 10;
+    }
 
     /**
      * Add a vertex to this graph.
@@ -125,6 +135,70 @@ function Graph() {
         vertex.y = y;
     }
 
+    function updateVertexVelocity_Unary () {
+        for (var i = 0, len = _vertexArray.length; i < len; i++) {
+            _vertexArray[i].updateVelocity();
+        }
+    }
+
+    function updateVertexVelocity_Pair () {
+        var accumulator = [];
+        for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
+            accumulator.push({x: 0, y: 0});
+        }
+
+        for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
+            for (var j = 0, len_j = _vertexArray.length; j < len_j; j++) {
+                const dist = distance(i, j);
+                if (dist === 0) continue;
+
+                const magnitude = magnitudeConstant_a / Math.exp(magnitudeConstant_b * dist);
+                const v1 = _vertexArray[i], v2 = _vertexArray[j];
+                const angle = Math.atan2(v2.y - v1.y, v2.x - v1.x);
+
+                accumulator[j].x += magnitude * Math.cos(angle);
+                accumulator[j].y += magnitude * Math.sin(angle);
+            }
+        }
+
+        for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
+            _vertexArray[i].addToVelocity(accumulator[i].x, accumulator[i].y);
+        }
+    }
+
+    function distance(idx1, idx2) {
+        const v1 = _vertexArray[idx1], v2 = _vertexArray[idx2];
+        return Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2));
+    }
+
+    function updateVertexDisplacement () {
+        for (var i = 0, len = _vertexArray.length; i < len; i++) {
+            _vertexArray[i].updateDisplacement();
+        }
+    }
+
+    function update() {
+        // Update vertex velocities based on the vertices' inertia
+        updateVertexVelocity_Unary();
+
+        // Update vertex velocities based on the interaction between node pairs
+        updateVertexVelocity_Pair();
+
+        // Update displacements of verticies.
+        updateVertexDisplacement();
+
+        // Render nodes
+        if (_graphEdit) { _graphEdit.update(); }
+
+        magnitudeConstant_a *= dumpingFactor;
+    }
+
+    setInterval(update, refreshRate_m);
+
+    function setGE (ge) {
+        _graphEdit = ge;
+    }
+
     return {
         vertices: _vertexArray,
         edges: _edgeArray,
@@ -136,77 +210,9 @@ function Graph() {
         getEdge: getEdge,
         removeVertex: removeVertex,
         removeEdge: removeEdge,
-        setVertexCoordinate: setVertexCoordinate
-    };
-}
-
-function Displacement (x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-function Velocity (x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-function Vertex (id, x, y) {
-    var _id = id,
-        _edges = [],
-        _x = x,
-        _y = y;
-
-    var _displacement = new Displacement(0, 0);
-    var _velocity = new Velocity(0, 0);
-
-    /**
-     * Add an edgeId.
-     * @param id
-     */
-    function addEdge (edge) {
-        _edges.push(edge);
-    }
-
-    /**
-     * Get an array of edgeIds that are connected to this vertex.
-     * @returns {Array}
-     */
-    function getEdges () {
-        return _edges;
-    }
-
-    /**
-     * Remove an edgeId from the _edgeIds array.
-     * @param id
-     */
-    function removeEdge(id) {
-        var edgeIdArray = _edges.map(function (e) { return e.id; }),
-            index = edgeIdArray.indexOf(id);
-        if (index > -1) {
-            _edges.splice(index, 1);
-        }
-    }
-
-    return {
-        x: _x,
-        y: _y,
-        id: _id,
-        addEdge: addEdge,
-        getEdges: getEdges,
-        removeEdge: removeEdge,
-        dx: _displacement.x,
-        dy: _displacement.y,
-        velocity: _velocity
-    };
-}
-
-function Edge (id, source, target) {
-    var _id = id,
-        _source = source,
-        _target = target;
-    return {
-        id: _id,
-        source: _source,
-        target: _target
+        setVertexCoordinate: setVertexCoordinate,
+        setGE: setGE,
+        update: update,
+        turnRepelOn: turnRepelOn
     };
 }

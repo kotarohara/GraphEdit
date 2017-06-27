@@ -6,6 +6,8 @@ function GraphEdit(graph, mouse) {
         temporaryVertices = [],
         temporaryEdges = [];
 
+    const velocityConstant = 0.01;
+
     var zoom = d3.behavior.zoom()
         .scaleExtent([1, 10])
         .on("zoom", zoomed);
@@ -13,7 +15,16 @@ function GraphEdit(graph, mouse) {
     function zoomed() {
       container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
       
-      console.log("=== Plane Translated ===");
+
+        // Set velocity based on the nearby node
+        const velocity = mouse.getVelocity();
+
+        for (var i = 0, len = graph.vertices.length; i < len; i++) {
+            graph.vertices[i].setVelocity(new Velocity(velocityConstant * velocity.x, velocityConstant * velocity.y));
+        }
+
+        graph.turnRepelOn();
+        update();
     }
 
     var margin = {top: -5, right: -5, bottom: -5, left: -5},
@@ -63,8 +74,6 @@ function GraphEdit(graph, mouse) {
     var vertexContainer = container.append("g");
 
 
-
-
     // Define behaviors and attributes
     var dragEdge = d3.behavior.drag()
             .origin(function (d) { return d; })
@@ -78,24 +87,61 @@ function GraphEdit(graph, mouse) {
             .on("dragend", endedDraggingVertex),
         edgeCoordinates = {
             x1: function (edge) {
-                return edge.source.x + edge.source.dx;
+                const p = edge.source,
+                    disp = p.getDisplacement();
+                if (disp) {
+                    return p.x + disp.x;
+                } else {
+                    return p.x + p.dx;
+                }
             },
             y1: function (edge) {
-                return edge.source.y + edge.source.dy;
+                const p = edge.source,
+                    disp = p.getDisplacement();
+                if (disp) {
+                    return p.y + disp.y;
+                } else {
+                    return p.y + p.dy;
+                }
+                // return edge.source.y + edge.source.dy;
             },
             x2: function (edge) {
-                return edge.target.x + edge.target.dx;
+                const p = edge.target,
+                    disp = p.getDisplacement();
+                if (disp) {
+                    return p.x + disp.x;
+                } else {
+                    return p.x + p.dx;
+                }
             },
             y2: function (edge) {
-                return edge.target.y + edge.target.dy;
+                const p = edge.target,
+                    disp = p.getDisplacement();
+                if (disp) {
+                    return p.y + disp.y;
+                } else {
+                    return p.y + p.dy;
+                }
             }
         },
         vertexCoordinate = {
             cx: function (d) {
-                return d.x + d.dx;
+                var disp = d.getDisplacement();
+                if (disp) {
+                    return d.x + disp.x;
+                } else {
+                    return d.x + d.dx;
+                }
+
             },
             cy: function (d) {
-                return d.y + d.dy;
+                var disp = d.getDisplacement();
+                if (disp) {
+                    return d.y + disp.y;
+                } else {
+                    return d.y + d.dy;
+                }
+
             }
         };
 
@@ -131,8 +177,8 @@ function GraphEdit(graph, mouse) {
     }
 
     function mouseMove() {
-        if (mode == "draw") {
-            if (temporaryVertices.length == 2) {
+        if (mode === "draw") {
+            if (temporaryVertices.length === 2) {
                 temporaryVertices[1].x = d3.mouse(this)[0];
                 temporaryVertices[1].y = d3.mouse(this)[1];
             }
@@ -146,10 +192,10 @@ function GraphEdit(graph, mouse) {
      * @param d
      */
     function startedDraggingVertex(d) {
-        if (mode == "edit") {
+        if (mode === "edit") {
             d3.event.sourceEvent.stopPropagation();
             d3.select(this).classed("dragging", true);
-        } else if (mode == "draw") {
+        } else if (mode === "draw") {
             d3.event.sourceEvent.stopPropagation();
         }
     }
@@ -159,7 +205,7 @@ function GraphEdit(graph, mouse) {
      * @param d
      */
     function draggingVertex(d) {
-        if (mode == "edit") {
+        if (mode === "edit") {
             // Update node coordinates
             d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
 

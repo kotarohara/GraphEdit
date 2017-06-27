@@ -56,6 +56,8 @@
 <script src="lib/d3.js"></script>
 <script src="lib/underscore.min.js"></script>
 <script src="src/Graph.js"></script>
+<script src="src/Vertex.js"></script>
+<script src="src/Edge.js"></script>
 <script src="src/GraphEdit.js"></script>
 <script src="src/Mouse.js"></script>
 <script>
@@ -76,5 +78,11 @@
         e4 = graph.addEdge(4, v4, v5);
 
     var graphEdit = new GraphEdit(graph, mouse);
+    graph.setGE(graphEdit);
+
+    for(var i = 0, len = graph.vertices.length; i < len; i++) {
+        graph.vertices[i].setGE(graphEdit);
+    }
+
 </script>
 </html>
