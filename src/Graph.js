@@ -14,11 +14,13 @@ function Graph() {
 
     const refreshRate_m = 1 / 60 * 1000;  // Displacement refreshrate
 
-    var magnitudeConstant_a = 0, magnitudeConstant_b = 0.05;
+    var repelConstant_a = 0, repelConstant_b = 0.05;
+    var attractConstant_a = 0, attractConstant_b = 0.05;
     const dumpingFactor = 0.9;
 
     function turnRepelOn() {
-        magnitudeConstant_a = 10;
+        repelConstant_a = 10;
+        attractConstant_a = 10;
     }
 
     /**
@@ -152,6 +154,7 @@ function Graph() {
             accumulator.push({x: 0, y: 0});
         }
 
+        // Repel between nodes
         for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
             for (var j = 0, len_j = _vertexArray.length; j < len_j; j++) {
 
@@ -160,7 +163,7 @@ function Graph() {
 
                 if (v1.id === v2.id) continue;
 
-                const magnitude = magnitudeConstant_a / Math.exp(magnitudeConstant_b * dist);
+                const magnitude = repelConstant_a / Math.exp(repelConstant_b * dist);
 
                 const noise = (Math.random() - 0.5) * 0.01;
                 const angle = Math.atan2(v2.y - v1.y + noise, v2.x - v1.x + noise);
@@ -168,6 +171,24 @@ function Graph() {
                 accumulator[j].x += magnitude * Math.cos(angle);
                 accumulator[j].y += magnitude * Math.sin(angle);
             }
+        }
+
+        // Attract between connected nodes
+        for (var i = 0, len = _edgeArray.length; i < len; i++) {
+            const edge = _edgeArray[i], v1 = edge.source, v2 = edge.target;
+            var v1Idx = _vertexArray.indexOf(v1), v2Idx = _vertexArray.indexOf(v2);
+
+            const dist = distance(v1Idx, v2Idx);
+            const magnitude = attractConstant_a / Math.exp(attractConstant_b * dist);
+
+            const noise = (Math.random() - 0.5) * 0.01;
+            const angle = Math.atan2(v2.y - v1.y + noise, v2.x - v1.x + noise);
+
+            accumulator[v1Idx].x += magnitude * Math.cos(angle);
+            accumulator[v1Idx].y += magnitude * Math.sin(angle);
+            accumulator[v2Idx].x -= magnitude * Math.cos(angle);
+            accumulator[v2Idx].y -= magnitude * Math.sin(angle);
+
         }
 
         for (var i = 0, len_i = _vertexArray.length; i < len_i; i++) {
@@ -199,7 +220,8 @@ function Graph() {
         // Render nodes
         if (_graphEdit) { _graphEdit.update(); }
 
-        magnitudeConstant_a *= dumpingFactor;
+        repelConstant_a *= dumpingFactor;
+        attractConstant_a *= dumpingFactor;
     }
 
     setInterval(update, refreshRate_m);
