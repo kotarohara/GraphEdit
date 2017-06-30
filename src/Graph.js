@@ -16,6 +16,7 @@ function Graph() {
 
     var repelConstant_a = 0, repelConstant_b = 0.05;
     var attractConstant_a = 0, attractConstant_b = 0.05;
+    const edgeRepelFactor = 3;
     const dumpingFactor = 0.9;
 
     function turnRepelOn() {
@@ -226,7 +227,7 @@ function Graph() {
                 var cp2 = _edgeArray[j].getControlPoint();
                 const dist = Math.sqrt(Math.pow(cp1.x - cp2.x, 2) + Math.pow(cp1.y - cp2.y, 2));
 
-                const magnitude = 2 * repelConstant_a / Math.exp(repelConstant_b * dist);
+                const magnitude = edgeRepelFactor * repelConstant_a / Math.exp(repelConstant_b * dist);
 
                 const noise = (Math.random() - 0.5) * 0.01;
                 const angle = Math.atan2(cp2.y - cp1.y + noise, cp2.x - cp1.x + noise);
@@ -240,14 +241,14 @@ function Graph() {
 
 
             // Get rid of the displacement along the
-            const noise = (Math.random() - 0.5) * 0.01;
+            const noise = (Math.random() - 0.5) * 0.001;
             var s = _edgeArray[i].source, t = _edgeArray[i].target;
             var vx = t.x - s.x + noise, vy = t.y - s.y + noise;
             var nx = -1/vx, ny = 1/vy, nd = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));
             nx /= nd;
             ny /= nd;
 
-            var ax = accumulator[i].x + noise, ay = accumulator[i].y + noise;
+            var ax = - accumulator[i].x, ay = - accumulator[i].y;
 
             _edgeArray[i].setControlPointDisplacement(ax * nx, ay * ny);
         }
