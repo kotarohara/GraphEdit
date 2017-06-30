@@ -86,6 +86,49 @@ function GraphEdit(graph, mouse) {
             .on("drag", draggingVertex)
             .on("dragend", endedDraggingVertex),
         edgeCoordinates = {
+            d: function (edge) {
+                const s = edge.source, t = edge.target, s_disp = s.getDisplacement(), t_disp = t.getDisplacement();
+
+                var x1, x2, y1, y2, xq, yq;
+                if (s_disp && t_disp) {
+                    x1 = s.x + s_disp.x;
+                    y1 = s.y + s_disp.y;
+                    x2 = t.x + t_disp.x;
+                    y2 = t.y + t_disp.y;
+                } else {
+                    x1 = s.x + s.dx;
+                    y1 = s.y + s.dy;
+                    x2 = t.x + t.dx;
+                    y2 = t.y + t.dy;
+                }
+
+                var cp = edge.getControlPoint(),
+                    dcp = edge.getControlPointDisplacement();
+                if (cp) {
+                    xq = cp.x + dcp.dx;
+                    yq = cp.y + dcp.dy;
+                } else {
+                    xq = (x1 + x2) / 2;
+                    yq = (y1 + y2) / 2;
+                }
+
+
+                return [
+                    "M", x1, " ", y1,
+                    "Q", xq, " ", yq,
+                    " ", x2, " ", y2
+                ].join("");
+
+                // 'M', p[0].x, ' ', p[0].y,
+                //     ' ', p[1].x, ' ', p[1].y
+                // ].join('');
+                // case 'Q':
+                // return [
+                //     'M', p[0].x, ' ', p[0].y,
+                //     'Q', p[1].x, ' ', p[1].y,
+                //     ' ', p[2].x, ' ', p[2].y
+
+            },
             x1: function (edge) {
                 const p = edge.source,
                     disp = p.getDisplacement();
@@ -158,7 +201,7 @@ function GraphEdit(graph, mouse) {
      * @param d
      */
     function mouseUp () {
-        if (mode == "draw") {
+        if (mode === "draw") {
         
             if (mousedownVertex) {
                 // Create a new vertex and a new edge
@@ -230,14 +273,14 @@ function GraphEdit(graph, mouse) {
      * @param d
      */
     function endedDraggingVertex(d) {
-        if (mode == "edit") {
+        if (mode === "edit") {
             d3.select(this).classed("dragging", false);
         }
         update();
     }
 
     function startedDraggingEdge() {
-        if (mode == "edit") {
+        if (mode === "edit") {
             d3.event.sourceEvent.stopPropagation();
             d3.select(this).classed("dragging", true);
         }
@@ -249,7 +292,7 @@ function GraphEdit(graph, mouse) {
      * @param d
      */
     function draggingEdge(d) {
-        if (mode == "edit") {
+        if (mode === "edit") {
             d3.select(this)
                 .attr("x1", d.source.x += d3.event.dx)
                 .attr("y1", d.source.y += d3.event.dy)
@@ -261,7 +304,7 @@ function GraphEdit(graph, mouse) {
     }
 
     function endedDraggingEdge(d) {
-        if (mode == "edit") {
+        if (mode === "edit") {
             d3.select(this).classed("dragging", false);
         }
         update();
@@ -277,7 +320,7 @@ function GraphEdit(graph, mouse) {
             d3.select(this).classed("active", false);
         },
         mousedown: function (d) {
-            if (mode == "draw") {
+            if (mode === "draw") {
                 var temporaryVertex1 = _.clone(d),
                     temporaryVertex2 = _.clone(d);
                 mousedownVertex = d;
@@ -289,14 +332,14 @@ function GraphEdit(graph, mouse) {
         },
         mouseup: function (d) {
             // Draw a new edge between two nodes
-            if (mode == "draw") {
+            if (mode === "draw") {
                 d3.event.stopPropagation();
                 if (mousedownVertex && mousedownVertex != d) {
                     graph.addEdge(graph.getUniqueEdgeId(), mousedownVertex, d);
                 }
-            } else if (mode == "delete") {
+            } else if (mode === "delete") {
                 graph.removeVertex(d.id);
-            } else if (mode == "edit") {
+            } else if (mode === "edit") {
                 // d3.event.stopPropagation();
             }
             temporaryVertices.splice(0, temporaryVertices.length);
@@ -313,7 +356,7 @@ function GraphEdit(graph, mouse) {
             d3.select(this).classed("active", false);
         },
         mouseup: function (d) {
-            if (mode == "delete") {
+            if (mode === "delete") {
                 graph.removeEdge(d.id);
             }
         }
@@ -325,12 +368,13 @@ function GraphEdit(graph, mouse) {
     var line, circle, temporaryLine, temporaryCircle;
     function update() {
         // Render Segments
-        line = segmentContainer.selectAll("line")
+        line = segmentContainer.selectAll("path")
             .data(graph.edges);
-        line.enter().append("line")
+        line.enter().append("path")
             .attr("stroke-width", 3)
             .attr("stroke", "black")
             .attr("stroke-opacity", 0.2)
+            .attr("fill", "none")
             .on(edgeEvents)
             .call(dragEdge);
         line.exit().remove();

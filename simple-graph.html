@@ -54,6 +54,7 @@
     </form>
 </body>
 <script src="lib/d3.js"></script>
+<!--<script src="lib/d3.v4.min.js"></script>-->
 <script src="lib/underscore.min.js"></script>
 <script src="src/Graph.js"></script>
 <script src="src/Vertex.js"></script>
@@ -88,7 +89,8 @@
         e8 = graph.addEdge(8, v8, v9),
         e9 = graph.addEdge(9, v9, v10),
         e10 = graph.addEdge(10, v10, v11),
-        e11 = graph.addEdge(11, v11, v9);
+        e11 = graph.addEdge(11, v11, v9),
+        e12 = graph.addEdge(12, v1, v2);
 
 
     var graphEdit = new GraphEdit(graph, mouse);

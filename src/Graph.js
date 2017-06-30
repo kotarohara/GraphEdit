@@ -207,6 +207,40 @@ function Graph() {
         }
     }
 
+    function updateBezierControlPoints () {
+        // Update the control point
+        for (var i = 0, len = _edgeArray.length; i < len; i++) {
+            _edgeArray[i].updateControlPoint();
+        }
+
+        var accumulator = [];
+        for (var i = 0, len_i = _edgeArray.length; i < len_i; i++) {
+            accumulator.push({x: 0, y: 0});
+        }
+
+        // Update the displacement
+        for (var i = 0, len_i = _edgeArray.length; i < len_i; i++) {
+            var cp1 = _edgeArray[i].getControlPoint();
+            for (var j = 0, len_j = _edgeArray.length; j < len_j; j++) {
+                if (i === j) continue;
+                var cp2 = _edgeArray[j].getControlPoint();
+                const dist = Math.sqrt(Math.pow(cp1.x - cp2.x, 2) + Math.pow(cp1.y - cp2.y, 2));
+
+                const magnitude = 2 * repelConstant_a / Math.exp(repelConstant_b * dist);
+
+                const noise = (Math.random() - 0.5) * 0.01;
+                const angle = Math.atan2(cp2.y - cp1.y + noise, cp2.x - cp1.x + noise);
+
+                accumulator[j].x += magnitude * Math.cos(angle);
+                accumulator[j].y += magnitude * Math.sin(angle);
+            }
+        }
+
+        for (var i = 0, len = _edgeArray.length; i < len; i++) {
+            _edgeArray[i].setControlPointDisplacement(accumulator[i].x, accumulator[i].y);
+        }
+    }
+
     function update() {
         // Update vertex velocities based on the vertices' inertia
         updateVertexVelocity_Unary();
@@ -216,6 +250,9 @@ function Graph() {
 
         // Update displacements of verticies.
         updateVertexDisplacement();
+
+        // Update the cotrol points of quadratic bezier curves
+        updateBezierControlPoints();
 
         // Render nodes
         if (_graphEdit) { _graphEdit.update(); }
