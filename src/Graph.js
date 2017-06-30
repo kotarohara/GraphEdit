@@ -237,7 +237,19 @@ function Graph() {
         }
 
         for (var i = 0, len = _edgeArray.length; i < len; i++) {
-            _edgeArray[i].setControlPointDisplacement(accumulator[i].x, accumulator[i].y);
+
+
+            // Get rid of the displacement along the
+            const noise = (Math.random() - 0.5) * 0.01;
+            var s = _edgeArray[i].source, t = _edgeArray[i].target;
+            var vx = t.x - s.x + noise, vy = t.y - s.y + noise;
+            var nx = -1/vx, ny = 1/vy, nd = Math.sqrt(Math.pow(nx, 2) + Math.pow(ny, 2));
+            nx /= nd;
+            ny /= nd;
+
+            var ax = accumulator[i].x + noise, ay = accumulator[i].y + noise;
+
+            _edgeArray[i].setControlPointDisplacement(ax * nx, ay * ny);
         }
     }
 
