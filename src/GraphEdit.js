@@ -118,16 +118,6 @@ function GraphEdit(graph, mouse) {
                     "Q", xq, " ", yq,
                     " ", x2, " ", y2
                 ].join("");
-
-                // 'M', p[0].x, ' ', p[0].y,
-                //     ' ', p[1].x, ' ', p[1].y
-                // ].join('');
-                // case 'Q':
-                // return [
-                //     'M', p[0].x, ' ', p[0].y,
-                //     'Q', p[1].x, ' ', p[1].y,
-                //     ' ', p[2].x, ' ', p[2].y
-
             },
             x1: function (edge) {
                 const p = edge.source,

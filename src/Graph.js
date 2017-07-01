@@ -57,7 +57,7 @@ function Graph() {
     function getUniqueVertexId () {
         var keys = _.map(Object.keys(_vertices), function (x) { return parseInt(x, 10); });
         for (;;_uniqueVertexId++) {
-            if (keys.indexOf(_uniqueVertexId) == -1) {
+            if (keys.indexOf(_uniqueVertexId) === -1) {
                 break;
             }
         }
@@ -68,7 +68,7 @@ function Graph() {
     function getUniqueEdgeId () {
         var keys = _.map(Object.keys(_edges), function (x) { return parseInt(x, 10); });
         for (;;_uniqueEdgeId++) {
-            if (keys.indexOf(_uniqueEdgeId) == -1) {
+            if (keys.indexOf(_uniqueEdgeId) === -1) {
                 break;
             }
         }
@@ -227,9 +227,8 @@ function Graph() {
                 var cp2 = _edgeArray[j].getControlPoint();
                 const dist = Math.sqrt(Math.pow(cp1.x - cp2.x, 2) + Math.pow(cp1.y - cp2.y, 2));
 
-                const magnitude = edgeRepelFactor * repelConstant_a / Math.exp(repelConstant_b * dist);
-
                 const noise = (Math.random() - 0.5) * 0.01;
+                const magnitude =  edgeRepelFactor * repelConstant_a / Math.exp(10 * repelConstant_b * dist);
                 const angle = Math.atan2(cp2.y - cp1.y + noise, cp2.x - cp1.x + noise);
 
                 accumulator[j].x += magnitude * Math.cos(angle);
@@ -248,9 +247,9 @@ function Graph() {
             nx /= nd;
             ny /= nd;
 
-            var ax = - accumulator[i].x, ay = - accumulator[i].y;
+            var ax = accumulator[i].x, ay = accumulator[i].y;
 
-            _edgeArray[i].setControlPointDisplacement(ax * nx, ay * ny);
+            _edgeArray[i].setControlPointDisplacement(ax, ay);
         }
     }
 

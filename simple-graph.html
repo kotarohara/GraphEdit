@@ -46,6 +46,7 @@
                 <td>mouse vy:</td>
                 <td id="mousevy"></td>
             </tr>
+        </table>
     </div>
     <form>
         <label class="mode-radio-labels"><input type="radio" name="mode" value="draw"> Draw</label>
@@ -77,8 +78,8 @@
         v8 = graph.addVertex(8, 502, 301),
         v9 = graph.addVertex(9, 501, 101),
         v10 = graph.addVertex(10, 531, 121),
-        v11 = graph.addVertex(11, 560, 81),
-        v12 = graph.addVertex(12, 99, 99);
+        v11 = graph.addVertex(11, 560, 81);
+        // v12 = graph.addVertex(12, 99, 99);
     var e0 = graph.addEdge(0, v0, v1),
         e1 = graph.addEdge(1, v1, v2),
         e2 = graph.addEdge(2, v2, v3),
@@ -91,7 +92,7 @@
         e9 = graph.addEdge(9, v9, v10),
         e10 = graph.addEdge(10, v10, v11),
         e11 = graph.addEdge(11, v11, v9),
-        e12 = graph.addEdge(12, v12, v2);
+        e12 = graph.addEdge(12, v1, v2);
 
 
     var graphEdit = new GraphEdit(graph, mouse);
