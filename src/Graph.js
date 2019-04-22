@@ -29,10 +29,11 @@ function Graph() {
      * @param id
      * @param x
      * @param y
+     * @param floor str
      */
-    function addVertex(id, x, y) {
+    function addVertex(id, x, y, floor) {
         if (!(id in _vertices)) {
-            _vertices[id] = new Vertex(id, x, y);
+            _vertices[id] = new Vertex(id, x, y, floor);
             _vertexArray.push(_vertices[id]);
             return _vertices[id];
         }

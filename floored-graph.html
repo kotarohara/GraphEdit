@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GraphEdit</title>
+    <link rel="stylesheet" href="css/ge.css" />
+</head>
+<style>
+    .brush .extent {
+        fill-opacity: .1;
+        stroke: #fff;
+        shape-rendering: crispEdges;
+    }
+
+    .dot circle {
+      fill: lightsteelblue;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+
+    .dot circle.dragging {
+      fill: red;
+      stroke: brown;
+    }
+
+    .axis line {
+      fill: none;
+      stroke: #ddd;
+      shape-rendering: crispEdges;
+      vector-effect: non-scaling-stroke;
+    }
+
+</style>
+<body>
+    <div id='svg-canvas'>
+
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td>mouse x:</td>
+                <td id="mousex"></td>
+                <td>mouse y:</td>
+                <td id="mousey"></td>
+            </tr>
+            <tr>
+                <td>mouse vx:</td>
+                <td id="mousevx"></td>
+                <td>mouse vy:</td>
+                <td id="mousevy"></td>
+            </tr>
+        </table>
+    </div>
+    <form>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="draw"> Draw</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="edit" checked> Edit</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="delete"> Delete</label>
+    </form>
+    <form>
+        <label class="floor-radio-labels"><input type="radio" name="floor" value="b1"> B1</label>
+        <label class="floor-radio-labels"><input type="radio" name="floor" value="f1" checked> F1</label>
+        <label class="floor-radio-labels"><input type="radio" name="floor" value="f2"> F2</label>
+    </form>
+</body>
+<script src="lib/d3.js"></script>
+<!--<script src="lib/d3.v4.min.js"></script>-->
+<script src="lib/underscore.min.js"></script>
+<script src="src/Graph.js"></script>
+<script src="src/Vertex.js"></script>
+<script src="src/Edge.js"></script>
+<script src="src/GraphEdit.js"></script>
+<script src="src/Mouse.js"></script>
+<script>
+
+    var mouse = new Mouse();
+
+    var graph = new Graph(),
+        v0 = graph.addVertex(0, 860, 215, 'f1'),
+        v1 = graph.addVertex(1, 894, 257, 'f1'),
+        v2 = graph.addVertex(2, 848, 295, 'f1'),
+        v3 = graph.addVertex(3, 820, 250, 'f1');
+        // v12 = graph.addVertex(12, 99, 99);
+    var e0 = graph.addEdge(0, v0, v1),
+        e1 = graph.addEdge(1, v1, v2),
+        e2 = graph.addEdge(2, v2, v3),
+        e3 = graph.addEdge(3, v3, v0);
+
+
+    var graphEdit = new GraphEdit(graph, mouse);
+    graph.setGE(graphEdit);
+
+    for(var i = 0, len = graph.vertices.length; i < len; i++) {
+        graph.vertices[i].setGE(graphEdit);
+    }
+
+</script>
+</html>

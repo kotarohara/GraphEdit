@@ -10,3 +10,7 @@ line.active, line.dragging, path.active, path.dragging {
     stroke: orange;
     stroke-opacity: 1;
 }
+
+.hidden {
+    visibility: hidden;
+}

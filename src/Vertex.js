@@ -9,11 +9,12 @@ function Velocity (x, y) {
     this.y = y;
 }
 
-function Vertex (id, x, y) {
+function Vertex (id, x, y, floor) {
     var _id = id,
         _edges = [],
         _x = x,
-        _y = y;
+        _y = y,
+        _floor = floor;
 
     // const refreshRate_m = 1 / 60 * 1000;  // Displacement refreshrate
     const _displacementFactor = 1.0;
@@ -98,6 +99,7 @@ function Vertex (id, x, y) {
         x: _x,
         y: _y,
         id: _id,
+        floor: _floor,
         addEdge: addEdge,
         addToVelocity: addToVelocity,
         getEdges: getEdges,

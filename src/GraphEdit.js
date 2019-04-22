@@ -32,7 +32,7 @@ function GraphEdit(graph, mouse) {
         height = 500 - margin.top - margin.bottom;
 
     // Prepare svg elements
-    var svg = d3.select("body")
+    var svg = d3.select("#svg-canvas")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -68,10 +68,38 @@ function GraphEdit(graph, mouse) {
         .attr("x2", width)
         .attr("y2", function(d) { return d; });
 
+   
+    var floorMapContainer = container.append("g");
 
     var segmentContainer = container.append("g");
     var temporaryDomContainer = container.append("g");
     var vertexContainer = container.append("g");
+
+    // Add floor maps
+    floorMapContainer.append("g:image")
+        .attr("class", "floor-map floor-b1 hidden")
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 1200)
+        //.attr('height', 400)
+        .attr('xlink:href', 'images/maps/NationalMuseumOfSingapore_B1.png')
+        
+    floorMapContainer.append("g:image")
+        .attr("class", "floor-map floor-f1")
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 1200)
+        //.attr('height', 400)
+        .attr('xlink:href', 'images/maps/NationalMuseumOfSingapore_F1.png')
+
+    floorMapContainer.append("g:image")
+        .attr("class", "floor-map floor-f2 hidden")
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 1200)
+        //.attr('height', 400)
+        .attr('xlink:href', 'images/maps/NationalMuseumOfSingapore_F2.png')
+
 
 
     // Define behaviors and attributes
@@ -186,20 +214,55 @@ function GraphEdit(graph, mouse) {
           mode = d3.select(this).property("value");
         });
 
+
+    /**
+     * Attach a call back function to floor switching radio buttions
+     * Also define a call back function.
+     */
+    d3.selectAll('.floor-radio-labels').selectAll('input')
+        .on('click', function () {
+            var floor = d3.select(this).property('value')
+            updateFloor(floor);
+        });
+
+    function getCurrentFloor () {
+        return d3.select('input[name="floor"]:checked').node().value;
+    }
+
+    function updateFloor(floor) {
+        d3.selectAll('.floor-map')
+            .classed('hidden', true);
+
+        d3.selectAll('.vertex')
+            .classed('hidden', true);
+        
+        // Show the floor map and the vertices that belong to the current floor
+        var floorClassName = '.floor-' + floor;
+        d3.selectAll(floorClassName)
+            .classed('hidden', false);
+        
+        // Show lines between vertices if one or both of the source or target belong to the current floor 
+        var lines = segmentContainer.selectAll("path");
+        lines.classed('hidden', function (d) {
+            return !(d.source.floor === floor || d.target.floor === floor);
+        });
+    }
+
     /**
      * A callback for a mouse event
      * @param d
      */
     function mouseUp () {
         if (mode === "draw") {
-        
+            var currentFloor = getCurrentFloor();
+            console.log(currentFloor);
             if (mousedownVertex) {
                 // Create a new vertex and a new edge
-                var newVertex = graph.addVertex(graph.getUniqueVertexId(), d3.mouse(this)[0], d3.mouse(this)[1]);
+                var newVertex = graph.addVertex(graph.getUniqueVertexId(), d3.mouse(this)[0], d3.mouse(this)[1], currentFloor);
                 graph.addEdge(graph.getUniqueEdgeId(), mousedownVertex, newVertex);
             } else {
                 // Create a new vertex
-                graph.addVertex(graph.getUniqueVertexId(), d3.mouse(this)[0], d3.mouse(this)[1]);
+                graph.addVertex(graph.getUniqueVertexId(), d3.mouse(this)[0], d3.mouse(this)[1], currentFloor);
            }
             mousedownVertex = null;
             temporaryVertices.splice(0, temporaryVertices.length);  // Empty an array. http://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
@@ -365,6 +428,7 @@ function GraphEdit(graph, mouse) {
             .attr("stroke", "black")
             .attr("stroke-opacity", 0.2)
             .attr("fill", "none")
+            .attr('class', 'edge')
             .on(edgeEvents)
             .call(dragEdge);
         line.exit().remove();
@@ -377,7 +441,11 @@ function GraphEdit(graph, mouse) {
             .attr("fill", "steelblue")
             .attr("stroke", "white")
             .attr("stroke-width", 2)
-            .attr("r", 6)
+            .attr("r", 5)
+            .attr('class', function (d) {
+                var floorClassName = 'vertex floor-' + d.floor;
+                return floorClassName;
+            })
             .on(vertexEvents)
             .call(dragVertex);
         circle.exit().remove();
