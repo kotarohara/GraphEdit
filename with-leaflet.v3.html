@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GraphEdit</title>
+
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+
+    <link rel="stylesheet" href="css/ge.css" />
+</head>
+<style>
+    .brush .extent {
+        fill-opacity: .1;
+        stroke: #fff;
+        shape-rendering: crispEdges;
+    }
+
+    .dot circle {
+      fill: lightsteelblue;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+
+    .dot circle.dragging {
+      fill: red;
+      stroke: brown;
+    }
+
+    .axis line {
+      fill: none;
+      stroke: #ddd;
+      shape-rendering: crispEdges;
+      vector-effect: non-scaling-stroke;
+    }
+
+    #mapid { 
+        height: 400px;
+        width: 600px;
+     }
+
+</style>
+<body>
+    <div>
+        <table>
+            <tr>
+                <td>mouse x:</td>
+                <td id="mousex"></td>
+                <td>mouse y:</td>
+                <td id="mousey"></td>
+            </tr>
+            <tr>
+                <td>mouse vx:</td>
+                <td id="mousevx"></td>
+                <td>mouse vy:</td>
+                <td id="mousevy"></td>
+            </tr>
+        </table>
+    </div>
+    <form>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="draw"> Draw</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="edit" checked> Edit</label>
+        <label class="mode-radio-labels"><input type="radio" name="mode" value="delete"> Delete</label>
+    </form>
+    <div id='mapid'></div>
+</body>
+
+<script type="module">
+    import { init } from './with-leaflet.v3.js';
+    import { MapLayer } from './src/MapLayer/maplayer.js';
+    import { Markers } from './src/MapLayer/markers.js';
+
+    const mapLayer = new MapLayer('mapid');
+    const markers = new Markers('mapid', mapLayer);
+  </script>
+</html>
